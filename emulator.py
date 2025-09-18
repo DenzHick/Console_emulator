@@ -1,14 +1,3 @@
-#!/usr/bin/env python3
-"""
-mini_shell.py
-Простой REPL-эмулятор shell (этап 1).
-- prompt: username@hostname:pwd$
-- парсинг аргументов с учётом кавычек (shlex)
-- заглушки: ls, cd (печатают своё имя и аргументы)
-- exit: завершает программу
-- демонстрация обработки ошибок (неправильные кавычки, недопустимый cd)
-"""
-
 import os
 import sys
 import shlex
@@ -19,8 +8,8 @@ import socket
 def make_prompt():
     user = getpass.getuser()
     host = socket.gethostname().split('.')[0]
-    cwd = os.getcwd()
     home = os.path.expanduser('~')
+    cwd = os.getcwd()
     if cwd == home or cwd.startswith(home + os.sep):
         if cwd == home:
             short = '~'
@@ -31,18 +20,16 @@ def make_prompt():
     return f"{user}@{host}:{short}$ "
 
 def parse_command(line):
-    # shlex.split корректно обрабатывает кавычки и экранирование похожим на shell образом.
     return shlex.split(line, posix=True)
 
-def cmd_ls(args):
+def ls(args):
     print("COMMAND: ls")
     print("ARGS:", args)
-    # для реалистичности можно показать список текущего каталога как пример (закомментировано)
     # for name in os.listdir('.'):
     #     print(name)
     # Но в задании сказано — заглушка, поэтому только имя и args.
 
-def cmd_cd(args):
+def cd(args):
     print("COMMAND: cd")
     print("ARGS:", args)
     if len(args) == 0:
@@ -54,13 +41,13 @@ def cmd_cd(args):
         os.chdir(os.path.expanduser(target))
         print(f"(changed directory to {os.getcwd()})")
     except FileNotFoundError:
-        print(f"cd: no such file or directory: {target}", file=sys.stderr)
+        print(f"cd: no such file or directory: {target}")
     except NotADirectoryError:
-        print(f"cd: not a directory: {target}", file=sys.stderr)
+        print(f"cd: not a directory: {target}")
     except PermissionError:
-        print(f"cd: permission denied: {target}", file=sys.stderr)
+        print(f"cd: permission denied: {target}")
     except Exception as e:
-        print(f"cd: error: {e}", file=sys.stderr)
+        print(f"cd: error: {e}")
 
 def repl():
     while True:
@@ -68,11 +55,10 @@ def repl():
             prompt = make_prompt()
             line = input(prompt)
         except EOFError:
-            # Ctrl-D
-            print()  # перевести строку аккуратно
+            # Ctrl-D полный выход
             break
         except KeyboardInterrupt:
-            # Ctrl-C — просто перейти на новую строку и продолжить
+            # Ctrl-C перенос строки
             print()
             continue
 
@@ -83,8 +69,7 @@ def repl():
         try:
             argv = parse_command(line)
         except ValueError as ve:
-            # shlex бросает ValueError при незакрытых кавычках
-            print(f"parse error: {ve}", file=sys.stderr)
+            print(f"parse error: {ve}")
             continue
 
         cmd = argv[0]
@@ -96,16 +81,13 @@ def repl():
                 try:
                     code = int(args[0])
                 except ValueError:
-                    print("exit: numeric argument required", file=sys.stderr)
+                    print("exit: numeric argument required")
                     code = 1
             print("Exiting shell...")
             sys.exit(code)
         elif cmd == 'ls':
-            cmd_ls(args)
+            ls(args)
         elif cmd == 'cd':
-            cmd_cd(args)
+            cd(args)
         else:
-            print(f"{cmd}: command not found", file=sys.stderr)
-
-if __name__ == '__main__':
-    repl()
+            print(f"{cmd}: command not found")
