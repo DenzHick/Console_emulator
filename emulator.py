@@ -26,8 +26,8 @@ def ls(args):
     print("COMMAND: ls")
     print("ARGS:", args)
     # for name in os.listdir('.'):
-    #     print(name)
-    # Но в задании сказано — заглушка, поэтому только имя и args.
+    #     print(name + ' ', end='')
+    # print()
 
 def cd(args):
     print("COMMAND: cd")
