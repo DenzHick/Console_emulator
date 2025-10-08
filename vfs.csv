@@ -1,5 +1,8 @@
-path,type,content
-/home,dir,
-/home/user,dir,
-/home/user/file1.txt,file,TGluZSAxCkxpbmUgMgpMaW5lIDM=
-/hello.txt,file,SGVsbG8gV29ybGQh
+path,type,content,permissions
+/home,dir,,
+/home/user,dir,,
+/home/user/documents,dir,,
+/home/user/documents/file1.txt,file,SGVsbG8sIHdvcmxkIQo=,644
+/home/user/documents/file2.txt,file,VGhpcyBpcyBhIHRlc3QuCg==,
+/etc,dir,,
+/etc/config.conf,file,IyBjb25maWd1cmF0aW9uIGZpbGUKClVTRVI9YWRtaW4KUEFTU1dPUkQ9cGFzc3dvcmQK,600
