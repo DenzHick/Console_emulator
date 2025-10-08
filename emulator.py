@@ -7,9 +7,10 @@ import argparse
 import csv
 import base64
 from io import StringIO
+import time
 
+start_time = time.time()
 
-# --- VFS (виртуальная файловая система) ---
 
 class VFSNode:
     """базовый узел в vfs (файл или папка)"""
@@ -132,10 +133,8 @@ def get_current_path():
     return '/' + '/'.join(reversed(path))
 
 
-# --- Конфигурация и старые функции ---
-
 config = {
-    'vfs_file': None,  # теперь это путь к файлу, а не папке
+    'vfs_file': 'vfs.csv',
     'startup_script': None,
 }
 
@@ -151,8 +150,6 @@ def make_prompt():
 def parse_command(line):
     return shlex.split(line, posix=True)
 
-
-# --- Команды эмулятора (обновленные) ---
 
 def pwd(args):
     """печатает текущий путь"""
@@ -220,6 +217,46 @@ def conf_dump(args):
         print(f"{key}={value or 'not set'}")
 
 
+def uptime(args):
+    """показывает время работы эмулятора"""
+    seconds = int(time.time() - start_time)
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    print(f"emulator up for {hours:02}:{minutes:02}:{seconds:02}")
+
+
+def rev(args):
+    """переворачивает строки в файле или stdin"""
+    if not args:
+        print("rev: missing operand")
+        return
+
+    node = get_node_from_path(args[0])
+    if node is None:
+        print(f"rev: {args[0]}: No such file or directory")
+    elif isinstance(node, VFSDirectory):
+        print(f"rev: {args[0]}: Is a directory")
+    elif isinstance(node, VFSFile):
+        for line in node.content.splitlines():
+            print(line[::-1])
+
+
+def tac(args):
+    """выводит строки файла в обратном порядке"""
+    if not args:
+        print("tac: missing operand")
+        return
+
+    node = get_node_from_path(args[0])
+    if node is None:
+        print(f"tac: {args[0]}: No such file or directory")
+    elif isinstance(node, VFSDirectory):
+        print(f"tac: {args[0]}: Is a directory")
+    elif isinstance(node, VFSFile):
+        for line in reversed(node.content.splitlines()):
+            print(line)
+
+
 # словарь для быстрого поиска команд
 BUILTIN_COMMANDS = {
     'pwd': pwd,
@@ -227,10 +264,11 @@ BUILTIN_COMMANDS = {
     'cd': cd,
     'cat': cat,
     'conf-dump': conf_dump,
+    'uptime': uptime,
+    'rev': rev,
+    'tac': tac,
 }
 
-
-# --- Основная логика (почти без изменений) ---
 
 def execute_command(line):
     """Обрабатывает одну строку с командой"""

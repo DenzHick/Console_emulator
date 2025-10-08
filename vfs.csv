@@ -1,0 +1,5 @@
+path,type,content
+/home,dir,
+/home/user,dir,
+/home/user/file1.txt,file,TGluZSAxCkxpbmUgMgpMaW5lIDM=
+/hello.txt,file,SGVsbG8gV29ybGQh
