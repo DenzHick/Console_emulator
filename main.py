@@ -1,28 +1,28 @@
 from emulator import *
-import os
 import argparse
-
 
 def main():
     # парсим аргументы командной строки
     parser = argparse.ArgumentParser(description="Console emulator.")
-    parser.add_argument('--vfs-root', help='Path to the physical location of the VFS.')
+    # изменил --vfs-root на --vfs-file
+    parser.add_argument('--vfs-file', help='Path to the CSV file for the VFS.')
     parser.add_argument('--startup-script', help='Path to a startup script to execute.')
 
     args = parser.parse_args()
 
     # обновляем глобальный конфиг
-    if args.vfs_root:
-        config['vfs_root'] = args.vfs_root
-        # если задан vfs, сразу переходим в него
-        if os.path.isdir(args.vfs_root):
-            os.chdir(args.vfs_root)
-        else:
-            print(f"warning: vfs-root directory '{args.vfs_root}' not found. Using current directory.")
-            config['vfs_root'] = os.getcwd()  # используем текущую как запасной вариант
-
+    if args.vfs_file:
+        config['vfs_file'] = args.vfs_file
     if args.startup_script:
         config['startup_script'] = args.startup_script
+
+    # загружаем vfs из файла
+    if config['vfs_file']:
+        load_vfs(config['vfs_file'])
+    else:
+        # если файл не указан, работаем с пустой vfs
+        print("warning: no --vfs-file provided. Using an empty VFS.")
+        load_vfs('') # вызов с пустым путем обработает ошибку
 
     # отладочный вывод заданных параметров
     print("--- Emulator Configuration ---")
